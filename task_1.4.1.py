@@ -70,3 +70,39 @@
 #
 # Формат выходных данных
 # Для каждого запроса get выведите в отдельной строке его результат.
+
+# dict_req = {}   # создаем пустой словарь
+# def my_func(req, namesp, var):
+#     dict_req
+#
+# n = int(input())  # получаем кол-во запросов
+# for _ in range(n):
+#     req, namesp, vars = input().split()  # получаем запросы
+#     dict_req[namesp] = [vars, ]
+# print(req, namesp, vars)
+
+
+n = int(input())                                         # получаем кол-во запросов
+dict_req = {'global': {'parent': None, 'vars': []}}      # создаем шаблон словаря
+
+
+def my_func(ns, v):
+    """Обработка запроса get рекурсией"""
+    for var in dict_req[ns]['vars']:                     # перебираем значения ключа vars в namespace
+        if var == v:                                     # если находим
+            return ns                                    # то возвращаем namespace
+    if dict_req[ns]['parent'] is None:                   # если не находим в global(е)
+        return None                                      # то возвращаем None
+    parent_ns = dict_req[ns]['parent']                   # пока не дошли до global
+    return my_func(parent_ns, v)                         # делаем рекурсию, изменяя namespace, но переменная таже
+
+
+for _ in range(n):                                       # цикл повторяется n раз
+    req, name_sp, var = input().split()                  # получаем три параметра запроса
+    if req == 'create':                                  # если тип запроса create
+        dict_req[name_sp] = {'parent': var, 'vars': []}  # добавляем ключ - значение в словарь
+    elif req == 'add':                                   # если тип запроса add
+        dict_req[name_sp]['vars'].append(var)            # добавляем переменные в список значений ключа vars
+    elif req == 'get':                                   # если тип запроса get
+        a = my_func(name_sp, var)                        # передаем аргументы в функцию my_func
+        print(a)                                         # выводим результаты работы функции
